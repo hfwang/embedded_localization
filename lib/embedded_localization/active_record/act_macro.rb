@@ -44,7 +44,7 @@ module EmbeddedLocalization
         #   -
         #+
 
-        after_initialize :initialize_i18n_hashes
+        # after_initialize :initialize_i18n_hashes
 
         # dynamically define the accessors for the translated attributes:
 
