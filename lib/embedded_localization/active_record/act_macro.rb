@@ -5,7 +5,7 @@ module EmbeddedLocalization
         return if translates?  # cludge to make sure we don't set this up twice..
 
         # for details about I18n fallbacks, check the source:
-        # i18n-0.6.0/lib/i18n/backend/fallbacks.rb  
+        # i18n-0.6.0/lib/i18n/backend/fallbacks.rb
         # i18n-0.6.0/lib/i18n/locale/fallbacks.rb
 
         # options[:fallbacks] => true or false # not used at this time
@@ -23,8 +23,9 @@ module EmbeddedLocalization
         # ::Rails::Railtie.subclasses.map(&:to_s).include?("ActiveRecord::Railtie")
         #+
 
-        serialize :i18n, Marshal   # we should also protect it from direct assignment by the user
-        
+        # we should also protect it from direct assignment by the user
+        serialize :i18n, EmbeddedLocalization::NilFriendlyMarshal
+
         #-
         # if Mongoid::Document is in the list of classes which extends the class we are included into:
         # ::Rails::Railtie.subclasses.map(&:to_s).include?("Rails::Mongoid::Railtie")
@@ -32,7 +33,7 @@ module EmbeddedLocalization
         #    field :i18n, type: Hash
         # but on the other hand, Mongoid now supports "localized fields" -- so we don't need to re-implement this.
         # Yay! Durran Jordan is awesome! :-) See: http://mongoid.org/docs/documents/localized.html
-        # 
+        #
         # NOTE: I like how Durran implemented the localization in Mongoid.. too bad I didn't see that before.
         # I'm thinking of re-writing this gem to store the localization hash per attribute... hmm... hmm... thinking...
         # there would be a couple of advantages to store the I18n-hash per attribute:
@@ -40,7 +41,7 @@ module EmbeddedLocalization
         #   - works well with rails scaffolding and with protection of attributes (attr_protected / attr_accessible)
         #   - we can easily hide the internal hash by re-defining the attr-accessors for doing the I18n
         #   - we can better add the per-attribute versioning, which is planned
-        #   - 
+        #   -
         #+
 
         after_initialize :initialize_i18n_hashes
@@ -48,7 +49,7 @@ module EmbeddedLocalization
         # dynamically define the accessors for the translated attributes:
 
         translated_attribute_names.each do |attr_name|
-          class_eval do 
+          class_eval do
             # define the getter method
             #
             define_method(attr_name) do |locale = I18n.locale|
@@ -84,11 +85,10 @@ module EmbeddedLocalization
           end
         end
       end
-      
+
       def translates?
         included_modules.include?(InstanceMethods)
       end
     end
   end
 end
-
